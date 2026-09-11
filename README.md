@@ -13,8 +13,9 @@ Tài liệu hướng dẫn chi tiết cách cài đặt, cấu hình và vận h
    - Tích vào ô xác minh robot (hCaptcha) để lấy một đoạn mã token (dạng `thr1.AAAA...`).
    - *Lưu ý:* Mã token này chỉ dùng được 1 lần và có thời hạn ngắn, mỗi lần bật lại bot bạn cần lấy token mới.
 3. **Mã Auth của Admin (để nhận quyền quản trị)**:
-   - Trong Haxball, mỗi người chơi có một chuỗi định danh duy nhất gọi là **Auth**.
-   - *Cách lấy Auth của mình:* Mở trình duyệt vào trang **https://www.haxball.com/playerauth** và copy đoạn mã hiển thị trên màn hình.
+   - Trong Haxball, mỗi người chơi có một chuỗi định danh duy nhất gọi là **Auth** (Public ID).
+   - *Cách lấy:* Mở trình duyệt vào trang **https://www.haxball.com/playerauth**, nhìn vào mục **Public ID** và copy toàn bộ đoạn mã phía sau chữ `ID: ` (Ví dụ: `_uCVm_mwqFh_...`).
+   - *Lưu ý:* Chỉ copy dòng **Public ID**, tuyệt đối không copy hay chia sẻ dòng Private Key.
 
 ---
 
