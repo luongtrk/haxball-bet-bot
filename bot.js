@@ -94,8 +94,6 @@ async function initHaxballBot() {
 // Token Haxball headless (lấy tại https://www.haxball.com/headlesstoken)
 const HAXBALL_TOKEN = process.env.HAXBALL_TOKEN || "";
 
-const SUPER_ADMIN_PASSWORD = process.env.SUPER_ADMIN_PASSWORD || "";
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "";
 const SUPER_ADMIN_AUTHS = process.env.SUPER_ADMIN_AUTHS ? process.env.SUPER_ADMIN_AUTHS.split(",").map(a => a.trim()) : [];
 const ROOM_NAME = `⚽𝘼𝙪𝙩𝙤 𝙍𝙤𝙤𝙢 (BET, FUN & SHOP) | LỎ NHẤT VN`;
 const PUBLIC = true;

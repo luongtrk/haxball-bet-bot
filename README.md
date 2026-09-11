@@ -62,8 +62,7 @@ cp .env.example .env
 ```
 Mở file `.env` và điền các thông tin:
 - `HAXBALL_TOKEN`: Lấy token phòng headless tại [Haxball Headless Token](https://www.haxball.com/headlesstoken).
-- `SUPER_ADMIN_PASSWORD` & `ADMIN_PASSWORD`: Mật khẩu quản trị viên.
-- `SUPER_ADMIN_AUTHS`: Danh sách Auth ID của Super Admin (nếu có).
+- `SUPER_ADMIN_AUTHS`: Danh sách Auth ID của Super Admin (phân cách bằng dấu phẩy).
 - `DISCORD_BOT_TOKEN` & `DISCORD_CHANNEL_ID`: Token bot Discord nếu muốn đồng bộ chat.
 
 ### Bước 3: Khởi động phòng
