@@ -205,4 +205,3 @@ data.json
 ```
 - File này tự động được lưu mỗi khi có thay đổi.
 - Khi chuyển bot sang máy khác hoặc backup, bạn chỉ cần copy file `data.json` này sang thư mục mới là giữ nguyên toàn bộ dữ liệu người chơi cũ.
-- File `data.json` đã được cấu hình trong `.gitignore` để không bị đẩy lên GitHub, tránh làm lộ thông tin người chơi.
