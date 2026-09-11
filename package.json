@@ -1,0 +1,19 @@
+{
+  "name": "haxball-bet-room",
+  "version": "1.0.0",
+  "description": "HaxBall Auto Room Bot with Bet, Shop, and Minigames",
+  "main": "bot.js",
+  "scripts": {
+    "start": "node bot.js",
+    "pm2": "pm2 start bot.js --name haxball-bet-room"
+  },
+  "dependencies": {
+    "discord.js": "^14.14.1",
+    "dotenv": "^16.4.5",
+    "haxball.js": "^2.0.7"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "license": "ISC"
+}
