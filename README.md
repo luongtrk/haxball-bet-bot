@@ -14,7 +14,7 @@ Tài liệu hướng dẫn chi tiết cách cài đặt, cấu hình và vận h
    - *Lưu ý:* Mã token này chỉ dùng được 1 lần và có thời hạn ngắn, mỗi lần bật lại bot bạn cần lấy token mới.
 3. **Mã Auth của Admin (để nhận quyền quản trị)**:
    - Trong Haxball, mỗi người chơi có một chuỗi định danh duy nhất gọi là **Auth**.
-   - *Cách xem Auth của mình:* Bạn bật bot lên, dùng nick của bạn vào phòng. Nhìn vào màn hình đen (terminal) của bot sẽ thấy dòng thông báo hiển thị tên và mã Auth của bạn. Copy mã đó dán vào cấu hình.
+   - *Cách lấy Auth của mình:* Mở trình duyệt vào trang **https://www.haxball.com/playerauth** và copy đoạn mã hiển thị trên màn hình.
 
 ---
 
