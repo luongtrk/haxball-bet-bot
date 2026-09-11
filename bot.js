@@ -1,5 +1,5 @@
 "use strict";
-require("dotenv").config();
+require("dotenv").config({ path: require("path").join(__dirname, ".env") });
 const fs = require("fs");
 const path = require("path");
 // Lưu trữ dữ liệu qua file data.json
@@ -78,10 +78,18 @@ process.on('uncaughtException', (err) => {
   console.error('Lỗi hệ thống:', err);
 });
 
-const hb = require("haxball.js");
-const HaxballJS = (hb && hb.default) ? hb.default : hb;
-
-HaxballJS().then(HBInit => {
+async function initHaxballBot() {
+  const hb = require("haxball.js");
+  let exported = (hb && hb.default) ? hb.default : hb;
+  let engine;
+  if (typeof exported === "function") {
+    engine = await exported();
+  } else if (exported && typeof exported.then === "function") {
+    engine = await exported;
+  } else {
+    engine = exported;
+  }
+  const HBInit = engine.HBInit || engine;
 
 // Token Haxball headless (lấy tại https://www.haxball.com/headlesstoken)
 const HAXBALL_TOKEN = process.env.HAXBALL_TOKEN || "";
@@ -9176,6 +9184,8 @@ try {
 } catch (e) {
   console.log("⚠️ Bạn chưa cài discord.js, hãy mở CMD chạy lệnh: npm install discord.js");
 }
-}).catch(err => {
+}
+
+initHaxballBot().catch(err => {
   console.error("Lỗi khi khởi tạo HaxballJS:", err);
 });
