@@ -1398,8 +1398,8 @@ function moneyFunc(value, player) {
   );
   return false;
 }
-let cachedTopList = null;
-let lastTopListUpdate = 0;
+var cachedTopList = null;
+var lastTopListUpdate = 0;
 
 function updateTopCoinsCache() {
   let list = [];
@@ -4582,9 +4582,6 @@ setInterval(() => {
   }, 4000);
 }, 24 * 60 * 1000); // Nhắc nhở mỗi 24 phút
 
-updateMetadata();
-
-
 async function checkMapRotation() {
   if (typeof getNonAfkPlayers !== "function" || typeof loadStadium !== "function") return;
 
@@ -4954,10 +4951,10 @@ function reorderPlayers() {
 // Thay vì ghi xuống ổ cứng mỗi lần savePlayerData() được gọi,
 // dữ liệu được giữ trên RAM và chỉ ghi xuống mỗi 15 giây 1 lần.
 // =========================================================================
-let playerCache = {};        // Lưu trữ tạm dữ liệu người chơi trên RAM
-let dirtyPlayers = new Set(); // Danh sách auth có dữ liệu thay đổi, chờ ghi xuống đĩa
-let statsCache = {};         // Lưu trữ tạm dữ liệu thống kê trên RAM
-let dirtyStats = new Set();   // Danh sách auth có thống kê thay đổi, chờ ghi xuống đĩa
+var playerCache = {};        // Lưu trữ tạm dữ liệu người chơi trên RAM
+var dirtyPlayers = new Set(); // Danh sách auth có dữ liệu thay đổi, chờ ghi xuống đĩa
+var statsCache = {};         // Lưu trữ tạm dữ liệu thống kê trên RAM
+var dirtyStats = new Set();   // Danh sách auth có thống kê thay đổi, chờ ghi xuống đĩa
 
 // Vòng lặp ghi đĩa định kỳ: Cứ 15 giây, ghi tất cả dữ liệu có thay đổi xuống ổ cứng
 setInterval(() => {
@@ -6432,8 +6429,8 @@ function showStatsFunc(value, player) {
   return false;
 }
 
-let cachedRankings = null;
-let lastRankingsUpdate = 0;
+var cachedRankings = null;
+var lastRankingsUpdate = 0;
 
 function updateRankingsCache() {
   let playerList = getPlayerStats();
@@ -9182,6 +9179,8 @@ try {
 } catch (e) {
   console.log("⚠️ Bạn chưa cài discord.js, hãy mở CMD chạy lệnh: npm install discord.js");
 }
+
+  updateMetadata();
 }
 
 initHaxballBot().catch(err => {
