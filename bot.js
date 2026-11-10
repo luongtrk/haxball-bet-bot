@@ -15,11 +15,11 @@ function _loadJsonStore() {
     }
   }
   const db = {};
-  _saveJsonStore(db);
+  _saveJsonStoreSync(db);
   return db;
 }
 
-function _saveJsonStore(db) {
+function _saveJsonStoreSync(db) {
   try {
     const tmp = DATA_FILE + ".tmp";
     fs.writeFileSync(tmp, JSON.stringify(db, null, 2), "utf8");
@@ -32,12 +32,57 @@ function _saveJsonStore(db) {
 class JsonLocalStorage {
   constructor() {
     this._db = _loadJsonStore();
+    this._keys = null;
+    this._saveTimer = null;
+    this._isWriting = false;
+    this._pendingWrite = false;
+  }
+  _getKeys() {
+    if (!this._keys) {
+      this._keys = Object.keys(this._db);
+    }
+    return this._keys;
+  }
+  _scheduleSave() {
+    if (this._saveTimer) return;
+    this._saveTimer = setTimeout(() => {
+      this._saveTimer = null;
+      this._flushAsync();
+    }, 500);
+  }
+  async _flushAsync() {
+    if (this._isWriting) {
+      this._pendingWrite = true;
+      return;
+    }
+    this._isWriting = true;
+    try {
+      const tmp = DATA_FILE + ".tmp";
+      const payload = JSON.stringify(this._db, null, 2);
+      await fs.promises.writeFile(tmp, payload, "utf8");
+      await fs.promises.rename(tmp, DATA_FILE);
+    } catch (e) {
+      console.error("Lỗi khi lưu async file data.json:", e);
+    } finally {
+      this._isWriting = false;
+      if (this._pendingWrite) {
+        this._pendingWrite = false;
+        this._scheduleSave();
+      }
+    }
+  }
+  flushSync() {
+    if (this._saveTimer) {
+      clearTimeout(this._saveTimer);
+      this._saveTimer = null;
+    }
+    _saveJsonStoreSync(this._db);
   }
   get length() {
-    return Object.keys(this._db).length;
+    return this._getKeys().length;
   }
   key(i) {
-    const keys = Object.keys(this._db);
+    const keys = this._getKeys();
     return (i >= 0 && i < keys.length) ? keys[i] : null;
   }
   getItem(k) {
@@ -46,20 +91,30 @@ class JsonLocalStorage {
   }
   setItem(k, v) {
     k = String(k);
-    this._db[k] = String(v);
-    _saveJsonStore(this._db);
+    v = String(v);
+    if (!Object.prototype.hasOwnProperty.call(this._db, k)) {
+      this._keys = null;
+    } else if (this._db[k] === v) {
+      return;
+    }
+    this._db[k] = v;
+    this._scheduleSave();
   }
   removeItem(k) {
     k = String(k);
-    delete this._db[k];
-    _saveJsonStore(this._db);
+    if (Object.prototype.hasOwnProperty.call(this._db, k)) {
+      delete this._db[k];
+      this._keys = null;
+      this._scheduleSave();
+    }
   }
   clear() {
     this._db = {};
-    _saveJsonStore(this._db);
+    this._keys = [];
+    this._scheduleSave();
   }
   *[Symbol.iterator]() {
-    for (const key of Object.keys(this._db)) {
+    for (const key of this._getKeys()) {
       yield key;
     }
   }
@@ -1070,9 +1125,15 @@ function checkCbLimit() {
   // Chỉ hoạt động khi trận đấu đang diễn ra
   if (typeof isPlaying !== 'undefined' && !isPlaying || MAX_CB_PLAYERS == 0) return;
 
-  let redPlayers = room.getPlayerList().filter((player) => player.team == 1);
-  let bluePlayers = room.getPlayerList().filter((player) => player.team == 2);
-  if (redPlayers.length < 4 || bluePlayers.length < 4) return;
+  let allPlayers = room.getPlayerList();
+  let redTeamCount = 0, blueTeamCount = 0;
+  let players = [];
+  for (let i = 0; i < allPlayers.length; i++) {
+    let p = allPlayers[i];
+    if (p.team === 1) { redTeamCount++; players.push(p); }
+    else if (p.team === 2) { blueTeamCount++; players.push(p); }
+  }
+  if (redTeamCount < 4 || blueTeamCount < 4) return;
 
   const disc1 = room.getDiscProperties(1);
   const disc3 = room.getDiscProperties(3);
@@ -1081,7 +1142,6 @@ function checkCbLimit() {
   const redLimitX = disc1.x;
   const blueLimitX = disc3.x;
 
-  let players = room.getPlayerList().filter((player) => player.team != 0);
   let redCount = 0, blueCount = 0;
 
   // TẠO CACHE: Lưu trước kích thước/thuộc tính của toàn bộ cầu thủ để tránh lag
@@ -1118,10 +1178,10 @@ function checkCbLimit() {
   });
 
   // Đẩy khớp nối tường Đội Đỏ (Disc 2)
-  if (redCount >= MAX_CB_PLAYERS) {
-    if (room.getDiscProperties(2) && room.getDiscProperties(2).y != 350) room.setDiscProperties(2, { y: 350 });
-  } else {
-    if (room.getDiscProperties(2) && room.getDiscProperties(2).y != -350) room.setDiscProperties(2, { y: -350 });
+  const disc2 = room.getDiscProperties(2);
+  if (disc2) {
+    const targetY2 = (redCount >= MAX_CB_PLAYERS) ? 350 : -350;
+    if (disc2.y != targetY2) room.setDiscProperties(2, { y: targetY2 });
   }
 
   // Áp dụng cGroup cho Đội Xanh
@@ -1138,10 +1198,10 @@ function checkCbLimit() {
   });
 
   // Đẩy khớp nối tường Đội Xanh (Disc 4)
-  if (blueCount >= MAX_CB_PLAYERS) {
-    if (room.getDiscProperties(4) && room.getDiscProperties(4).y != 350) room.setDiscProperties(4, { y: 350 });
-  } else {
-    if (room.getDiscProperties(4) && room.getDiscProperties(4).y != -350) room.setDiscProperties(4, { y: -350 });
+  const disc4 = room.getDiscProperties(4);
+  if (disc4) {
+    const targetY4 = (blueCount >= MAX_CB_PLAYERS) ? 350 : -350;
+    if (disc4.y != targetY4) room.setDiscProperties(4, { y: targetY4 });
   }
 }
 
@@ -1409,10 +1469,10 @@ function updateTopCoinsCache() {
     const auth = key.slice(3);
     if (auth.length !== 43) continue;
     try {
-      const data = getPlayerData(auth);
+      const data = playerCache[auth] || JSON.parse(localStorage.getItem(key) || "{}");
       const coins = data.coins || 0;
       const gems = data.gems || 0;
-      const stats = getStats(auth);
+      const stats = statsCache[auth] || JSON.parse(localStorage.getItem(auth) || "{}");
       const name = stats.name || auth.substring(0, 8) + ".";
       list.push({ auth, name, coins, gems });
     } catch (e) { }
@@ -8587,7 +8647,6 @@ room.onTeamGoal = function (team) {
 
 room.onPositionsReset = function () {
   isGoalCelebration = false;
-  playerBlockCache = {};
   cleanupEffectDiscs(); // <--- THÊM DÒNG NÀY VÀO ĐÂY
   // --- CÁC TÍNH NĂNG CŨ BÊN DƯỚI GIỮ NGUYÊN ---
   if (isTakingPenalty) {
@@ -8689,6 +8748,10 @@ if (typeof process !== "undefined") {
       console.log(`[${signal}] Cache flush xong. An toàn thoát.`);
     }
 
+    if (typeof localStorage !== "undefined" && typeof localStorage.flushSync === "function") {
+      localStorage.flushSync();
+    }
+
     process.exit(0);
   }
 
@@ -8696,6 +8759,11 @@ if (typeof process !== "undefined") {
   // Cần lắng nghe CẢ HAI để đảm bảo không bao giờ bị mất dữ liệu
   process.on("SIGTERM", () => gracefulShutdown("SIGTERM")); // PM2 restart/stop
   process.on("SIGINT",  () => gracefulShutdown("SIGINT"));  // Ctrl+C
+  process.on("exit", () => {
+    if (typeof localStorage !== "undefined" && typeof localStorage.flushSync === "function") {
+      localStorage.flushSync();
+    }
+  });
 }
 
 room.onPlayerChat = function (player, message) {
