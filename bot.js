@@ -149,7 +149,9 @@ async function initHaxballBot() {
 // Token Haxball headless (lấy tại https://www.haxball.com/headlesstoken)
 const HAXBALL_TOKEN = process.env.HAXBALL_TOKEN || "";
 
-const SUPER_ADMIN_AUTHS = process.env.SUPER_ADMIN_AUTHS ? process.env.SUPER_ADMIN_AUTHS.split(",").map(a => a.trim()) : [];
+const SUPER_ADMIN_AUTHS = process.env.SUPER_ADMIN_AUTHS
+  ? process.env.SUPER_ADMIN_AUTHS.split(",").map(a => a.trim()).filter(Boolean)
+  : [];
 const ROOM_NAME = `⚽𝘼𝙪𝙩𝙤 𝙍𝙤𝙤𝙢 (BET, FUN & SHOP) | LỎ NHẤT VN`;
 const PUBLIC = true;
 const ACTIVITY_TIMEOUT = 10;
@@ -8274,7 +8276,7 @@ room.onPlayerJoin = async function (player) {
     }
   }
 
-  if (SUPER_ADMIN_AUTHS.includes(player.auth)) {
+  if (auth && SUPER_ADMIN_AUTHS.includes(auth)) {
     room.setPlayerAdmin(player.id, true);
     setTimeout(() => {
       room.sendAnnouncement(`👑 NHA VUA ${player.name} DA DEN. Cúi đầu chào đi các con dân!`, null, 0xFBFC92, "bold", 2);
